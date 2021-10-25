@@ -44,7 +44,9 @@ class L2Estimator(Estimator):
     def _generate_random_hash_parameters(self):
         """
         Generate random parameters for the hash functions. To generate 4-wise independent
-        hash functions, we use polynomial of degree 3 (ref: https://en.wikipedia.org/wiki/K-independent_hashing). For example, the hash function for x would be
+        hash functions, we use polynomial of degree 3 
+        (ref: https://en.wikipedia.org/wiki/K-independent_hashing).
+        For example, the hash function for x would be
 
             h(x) = {[(x_3 * x^3 + x_2 * x^2 + x_1 * x + x_0) mod p] mod 2} * 2 - 1
         
