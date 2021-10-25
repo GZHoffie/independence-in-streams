@@ -100,4 +100,4 @@ class L2Estimator(Estimator):
 
         # Calculate the median of all means
         med = np.median(means)
-        return med
+        return np.sqrt(med)
