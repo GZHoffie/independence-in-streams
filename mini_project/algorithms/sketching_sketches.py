@@ -28,7 +28,7 @@ class L2Estimator(Estimator):
         self.B = B
 
         # Number of items in the stream
-        self.m += 1
+        self.m = 0
 
         # Matrices to store intermediate values
         self.t_1 = np.zeros((A, B), dtype=int)
