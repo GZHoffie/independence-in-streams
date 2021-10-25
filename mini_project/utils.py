@@ -56,6 +56,8 @@ Utils used to generate random hash functions.
 
 hash_primes: list of prime numbers that are good to generate random hash functions.
 _choose_prime: A function that returns a prime number larger than a number in the prime list.
+
+Reference: https://gcc.gnu.org/onlinedocs/gcc-4.8.5/libstdc++/api/a00971_source.html
 """
 hash_primes = [
     5,
