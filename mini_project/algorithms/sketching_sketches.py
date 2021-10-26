@@ -28,7 +28,7 @@ class L2Estimator(Estimator):
         self.B = B
 
         # Number of items in the stream
-        self.m = 0
+        self.N = 0
 
         # Matrices to store intermediate values
         self.t_1 = np.zeros((A, B), dtype=int)
@@ -90,12 +90,12 @@ class L2Estimator(Estimator):
         self.t_1 += x_i * y_j
         self.t_2 += x_i
         self.t_3 += y_j
-        self.m += 1
+        self.N += 1
     
 
     def compute(self) -> float:
         # Calculate estimator Upsilon
-        Upsilon = (self.t_1 / self.m - self.t_2 * self.t_3 / self.m ** 2) ** 2
+        Upsilon = (self.t_1 / self.N - self.t_2 * self.t_3 / self.N ** 2) ** 2
 
         # Calculate mean of each group
         means = np.mean(Upsilon, axis=0)

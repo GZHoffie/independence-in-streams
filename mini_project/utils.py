@@ -1,3 +1,10 @@
+import os
+import warnings
+import pickle
+
+TEST_DATA_DIR = "mini_project/test/test_data/"
+GROUND_TRUTH_DIR = "mini_project/test/ground_truth/"
+
 class Estimator:
     """
     Base class for the correlation estimators.
@@ -6,7 +13,6 @@ class Estimator:
         input_type (class): Usually int or float, indicating the type of input.
     """
     def __init__(self, input_type=int) -> None:
-        self.result = 0                # Storing the estimated metric
         self.input_type = input_type   # Input type (int or float)
     
 
@@ -29,7 +35,7 @@ class Estimator:
         Args:
             file_name (string): the path to the data file.
         """
-        with open(file_name, 'r') as f:
+        with open(TEST_DATA_DIR + file_name + ".txt", 'r') as f:
             for line in f:
                 i, j = [self.input_type(x) for x in line.split()]
                 self._read_item(i, j)
@@ -42,7 +48,7 @@ class Estimator:
         Returns:
             The estimated value of the metric specified.
         """
-        return self.result
+        pass
 
     def reset(self):
         """
@@ -50,6 +56,82 @@ class Estimator:
         """
         pass
 
+
+class DataGenerator:
+    """
+    Base class for the data generators.
+
+    Args:
+        output_type (class): Usually int or float, indicating the type of output.
+        N (int): the length of the stream
+        overwrite (bool): if set to False, will not generate new dataset if the specified
+            file path exist
+    """
+    def __init__(self, output_type=int, N=100000, overwrite=True) -> None:
+        self.output_type = output_type   # Input type (int or float)
+        self.N = N                       # Length of the stream
+        self.ground_truth = None
+        self.overwrite = overwrite
+
+
+    def _generate_item(self):
+        """
+        Generate a pair of samples i and j.
+
+        Returns:
+            i (int or float): a sample in the stream that follows distribution X.
+            j (int or float): a sample in the stream that follows distribution Y.
+        """
+        pass
+
+
+    def write_file(self, file_name: str):
+        """
+        Write the stream to a file. For each line, there should be 2 numbers, which are
+        the samples from X and Y distributions, respectively.
+
+        Args:
+            file_name (string): the path to the data file.
+        """
+        # Write data
+        if os.path.exists(TEST_DATA_DIR + file_name + ".txt") and not self.overwrite:
+            warnings.warn(f"The path {file_name}.txt already exists in {TEST_DATA_DIR}. Skipping the function.")
+            return
+        with open(TEST_DATA_DIR + file_name + ".txt", 'w') as f:
+            for _ in range(self.N):
+                i, j = self._generate_item()
+                f.write(str(i) + " " + str(j) + "\n")
+        
+        with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'wb') as p:
+            pickle.dump(self.ground_truth, p, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+
+def check_error(estimator: Estimator, file_name: str, metric: str = "l2"):
+    """
+    Evaluate the estimator using a stream, and check on the corresponding stream.
+
+    Args:
+        estimator (utils.Estimator): An estimator to be tested.
+        file_name (string): A path to the file in which the stream is stored.
+        metric (string): one of the metrics indicated above.
+    """
+    with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'rb') as p:
+        ground_truth = pickle.load(p)
+    
+    assert metric in ground_truth, f"the metric {metric} is not computed in the"\
+        f"specified ground truth file {GROUND_TRUTH_DIR}{file_name}.pickle."
+    
+    estimator.read_from_file(file_name)
+    res = estimator.compute()
+
+    if metric != "independent":
+        # Return multiplicative error
+        return abs(1 - res/ground_truth[metric])
+    else:
+        # Return 0 if correctly identified independence/dependence and 1 otherwise
+        return int(res != ground_truth[metric])
+   
 
 """
 Utils used to generate random hash functions.

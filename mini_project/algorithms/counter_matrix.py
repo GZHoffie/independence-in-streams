@@ -6,11 +6,10 @@ class CounterMatrix(Estimator):
     """
     The class that uses a counter matrix to estimate the metrics.
     """
-    def __init__(self, A: int, n: int) -> None:
+    def __init__(self, A: int) -> None:
         super().__init__(input_type=int)
         self.C = np.zeros((A, A), dtype=int)
-        self.m = 0
-        self.n = n
+        self.N = 0
         self.A = A
 
         # Generate hash functions
@@ -44,13 +43,13 @@ class CounterMatrix(Estimator):
     def _read_item(self, i, j):
         x, y = self._calculate_hash_functions(i, j)
         self.C[x, y] += 1
-        self.m += 1
+        self.N += 1
 
     def compute(self) -> float:
         p_x = np.sum(self.C, axis=1, keepdims=True)
         p_y = np.sum(self.C, axis=0, keepdims=True)
-        observed = self.C / self.m
-        expected = np.dot(p_x, p_y) / self.m ** 2
+        observed = self.C / self.N
+        expected = np.dot(p_x, p_y) / self.N ** 2
         
         return np.linalg.norm(observed - expected)
 
