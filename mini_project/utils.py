@@ -2,8 +2,10 @@ import os
 import warnings
 import pickle
 
+
 TEST_DATA_DIR = "mini_project/test/test_data/"
 GROUND_TRUTH_DIR = "mini_project/test/ground_truth/"
+ANSWER_DIR = "mini_project/test/answer/"
 
 class Estimator:
     """
@@ -14,6 +16,7 @@ class Estimator:
     """
     def __init__(self, input_type=int) -> None:
         self.input_type = input_type   # Input type (int or float)
+        self.N = 0                     # Length of the stream
     
 
     def _read_item(self, i, j):
@@ -24,6 +27,7 @@ class Estimator:
             i (int or float): a sample in the stream that follows distribution X.
             j (int or float): a sample in the stream that follows distribution Y.
         """
+        self.N += 1
         pass
 
 
@@ -85,6 +89,7 @@ class DataGenerator:
         pass
 
 
+
     def write_file(self, file_name: str):
         """
         Write the stream to a file. For each line, there should be 2 numbers, which are
@@ -116,21 +121,31 @@ def check_error(estimator: Estimator, file_name: str, metric: str = "l2"):
         file_name (string): A path to the file in which the stream is stored.
         metric (string): one of the metrics indicated above.
     """
-    with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'rb') as p:
-        ground_truth = pickle.load(p)
+    # with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'rb') as p:
+    #     ground_truth = pickle.load(p)
     
-    assert metric in ground_truth, f"the metric {metric} is not computed in the"\
-        f"specified ground truth file {GROUND_TRUTH_DIR}{file_name}.pickle."
+    with open(ANSWER_DIR + file_name + ".pickle", 'rb') as p:
+        answer = pickle.load(p)
+    
+    # assert metric in ground_truth, f"the metric {metric} is not computed in the"\
+    #     f"specified ground truth file {GROUND_TRUTH_DIR}{file_name}.pickle."
+    assert metric in answer, f"the metric {metric} is not computed in the"\
+        f"specified ground truth file {ANSWER_DIR}{file_name}.pickle."
+    
+    print(answer)
     
     estimator.read_from_file(file_name)
     res = estimator.compute()
 
+    print("Estimator result:", res)
+    print("Answer:", answer[metric])
+
     if metric != "independent":
         # Return multiplicative error
-        return abs(1 - res/ground_truth[metric])
+        return abs(1 - res/answer[metric])
     else:
         # Return 0 if correctly identified independence/dependence and 1 otherwise
-        return int(res != ground_truth[metric])
+        return int(res != answer[metric])
    
 
 """

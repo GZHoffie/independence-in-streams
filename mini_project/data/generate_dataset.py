@@ -1,4 +1,6 @@
-from mini_project.utils import DataGenerator
+from mini_project.utils import DataGenerator, ANSWER_DIR
+from mini_project.algorithms.exact import ExactEstimator
+import pickle
 import numpy as np
 
 class DiscreteSampleGenerator(DataGenerator):
@@ -77,10 +79,21 @@ class DiscreteSampleGenerator(DataGenerator):
         j = np.argmax(np.random.multinomial(1, py_x.flatten(), size=1))
         
         return i + 1, j + 1
+    
+    def write_file(self, file_name: str):
+        super().write_file(file_name)
+        estimator = ExactEstimator(self.n, metric=["l1", "l2", "independent"])
+        estimator.read_from_file(file_name)
+        l1, l2, independent = estimator.compute()
+        answer = {"l1": l1, "l2": l2, "independent": independent}
+        print(answer)
+
+        with open(ANSWER_DIR + file_name + ".pickle", 'wb') as p:
+            pickle.dump(answer, p, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == "__main__":
-    generator = DiscreteSampleGenerator(n=20, N=100000)
+    generator = DiscreteSampleGenerator(n=1000, N=100000, independent=False)
     generator.write_file("sample")
 
     

@@ -86,11 +86,11 @@ class L2Estimator(Estimator):
     
 
     def _read_item(self, i: int, j: int):
+        super()._read_item(i, j)
         x_i, y_j = self._calculate_hash_functions(i, j)
         self.t_1 += x_i * y_j
         self.t_2 += x_i
         self.t_3 += y_j
-        self.N += 1
     
 
     def compute(self) -> float:

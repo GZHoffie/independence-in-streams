@@ -5,12 +5,14 @@ import numpy as np
 class CounterMatrix(Estimator):
     """
     The class that uses a counter matrix to estimate the metrics.
+
+    Args:
+        A (int): set the size of counter matrix to be A * A
     """
     def __init__(self, A: int) -> None:
         super().__init__(input_type=int)
-        self.C = np.zeros((A, A), dtype=int)
-        self.N = 0
-        self.A = A
+        self.C = np.zeros((A, A), dtype=int)   # Counter matrix
+        self.A = A                             # Size of counter matrix
 
         # Generate hash functions
         self.p = _choose_prime(10 * A)
@@ -41,9 +43,9 @@ class CounterMatrix(Estimator):
         return x, y
     
     def _read_item(self, i, j):
+        super()._read_item(i, j)
         x, y = self._calculate_hash_functions(i, j)
         self.C[x, y] += 1
-        self.N += 1
 
     def compute(self) -> float:
         p_x = np.sum(self.C, axis=1, keepdims=True)
@@ -52,6 +54,36 @@ class CounterMatrix(Estimator):
         expected = np.dot(p_x, p_y) / self.N ** 2
         
         return np.linalg.norm(observed - expected)
+
+
+class L2Estimator(Estimator):
+    """
+    Estimator for L2 difference that uses multiple counter matrices and return the largest
+    norm (since result from counter matrix is always underestimated).
+
+    Args:
+        A (int): size of counter matrix
+        B (int): number of counter matrices
+    """
+    def __init__(self, A: int, B: int) -> None:
+        super().__init__(input_type=int)
+
+        self.C_list = []
+        for _ in range(B):
+            self.C_list.append(CounterMatrix(A))
+        
+    def _read_item(self, i, j):
+        for C in self.C_list:
+            C._read_item(i, j)
+    
+    def compute(self) -> float:
+        res = 0.0
+        for C in self.C_list:
+            res = max(res, C.compute())
+        return res
+
+
+
 
 
 
