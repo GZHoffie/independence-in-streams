@@ -8,9 +8,10 @@ def test_l2_estimator():
     """
     Test function for l2 estimator.
     """
-    estimator = CounterMatrix(100, 2)
+    estimator = CounterMatrix(10, 2)
     estimator.read_from_file(TEST_FILE)
     l2_estimate = estimator.compute()
+    print(l2_estimate)
     print("multiplicative error:", abs(1 - l2_estimate / L2_DIFFERENCE))
 
 if __name__ == "__main__":
