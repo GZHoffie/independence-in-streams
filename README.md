@@ -32,7 +32,7 @@ Three files will be generated in `mini_project/test` directory,
 
 - `test_data/sample.txt`, containing the data stream. Each line of the file contains two integers, indicating the samples drawn from the distributions.
 - `ground_truth/sample.pickle`, storing a `dict` of `l1`-difference, `l2`-difference and independence of the data, based on the distribution that is used to generate samples.
-- `answer/sample.pickle`, storing a `dict` of the ground truth of `l1`-difference, `l2`-difference and independence of the data, based on the actual generated data stream. It may differ from ground_truth, especially when `n` is large or `N` is small.
+- `answer/sample.pickle`, storing a `dict` of `l1`-difference, `l2`-difference and independence of the data, based on the actual generated data stream. It may differ from ground_truth, especially when `n` is large or `N` is small.
 
 ## Running Algorithms
 
