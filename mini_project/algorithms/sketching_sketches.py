@@ -103,3 +103,74 @@ class L2Estimator(Estimator):
         # Calculate the median of all means
         med = np.median(means)
         return np.sqrt(med)
+
+
+class L1Estimator(Estimator):
+    """
+    The class for estimating L1 difference of two distributions. We use the s number of distributions 
+    x_1 ... x_s following Cauchy distribution that are independent, and one distribution following 
+    T-truncated-Cauchy for the estimation.
+    """
+
+    def __init__(self, delta: float, s: int, n: int = 10000) -> None:
+        """
+        To reduce error, the user should specify A=O(ε^(-2)) and B=O(log(1/δ))
+        so that we can achive an (1+ε)-multiplicative error with probability at least
+        1-δ.
+
+        Args:
+            delta (float): params for (O(ln n), δ)-approx. Determines number of experiments in each 
+                           group (also space usage). We take the mean in each group.
+            s (int): number of groups we run. We take the median values of |t_1_r/m - t_2_r*t_3_r/m^2| 
+                     for all r in each group 
+            n (int): Range of X and Y should be [1, n]. 
+        """
+        super().__init__(input_type=int)
+        print("Hi")
+        print(np.random.standard_cauchy(n).shape)
+        print(np.random.standard_cauchy(n))
+
+        # Number of experience run
+
+        self.A = int(np.ceil(np.log(1/delta)))
+        self.B = s
+        self.n = n
+
+        # Number of items in the stream
+        self.N = 0
+
+        # Matrices to store intermediate values
+        self.t_1 = np.zeros((self.A, self.B), dtype=float)
+        self.t_2 = np.zeros((self.A, self.B), dtype=float)
+        self.t_3 = np.zeros(self.A, dtype=float)
+
+        # # Use polynomial of degree 3 to generate 4-independent hash functions
+        # self.p = _choose_prime(10 * n)
+        # self.param_x = self._generate_random_hash_parameters()
+        # self.param_y = self._generate_random_hash_parameters()
+
+    def _get_random_cauchy():
+        pass
+
+    def _get_t_trukcated_cauchy():
+        pass
+
+    def _read_item(self, i: int, j: int):
+        super()._read_item(i, j)
+        # x_i, y_j = self._calculate_hash_functions(i, j)
+        # self.t_1 += x_i * y_j
+        # self.t_2 += x_i
+        # self.t_3 += y_j
+        pass
+
+    def compute(self) -> float:
+        # Calculate estimator Upsilon
+        # Upsilon = (self.t_1 / self.N - self.t_2 * self.t_3 / self.N ** 2) ** 2
+
+        # # Calculate mean of each group
+        # means = np.mean(Upsilon, axis=0)
+
+        # # Calculate the median of all means
+        # med = np.median(means)
+
+        return 0
