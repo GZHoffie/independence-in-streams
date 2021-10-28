@@ -174,13 +174,13 @@ class L1Estimator(Estimator):
 
     def _read_item(self, i: int, j: int) -> None:
         super()._read_item(i, j)
-        self.t_1 += self.x_cauchy[:, :, i] * np.dot(self.y_cauchy[:, j].reshape(self.A, 1), np.ones(self.B).reshape(1, self.B))
+        self.t_1 += self.x_cauchy[:, :, i] * np.dot(self.y_cauchy[:, j].reshape(self.A, 1), np.ones((1, self.B)))
         self.t_2 += self.x_cauchy[:, :, i]
         self.t_3 += self.y_cauchy[:, j]
 
     def compute(self) -> float:
         # Calculate estimator Upsilon
-        t_3 = np.dot(self.t_3.reshape(self.A, 1), np.ones(self.B).reshape(1, self.B))
+        t_3 = np.dot(self.t_3.reshape(self.A, 1), np.ones((1, self.B)))
         Upsilon = np.abs((self.t_1 / self.N - self.t_2 * t_3 / self.N ** 2) ** 2)
 
         # Calculate mean of each group
