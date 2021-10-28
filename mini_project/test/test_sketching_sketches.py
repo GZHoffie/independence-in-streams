@@ -16,7 +16,7 @@ def test_l1_estimator():
     """
     Test function for l1 estimator.
     """
-    estimator = L1Estimator(0.05, 100)
+    estimator = L1Estimator(0.1, 5)
     error = check_error(estimator, TEST_FILE, 'l1')
     print("multiplicative error:", error)
 

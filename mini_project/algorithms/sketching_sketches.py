@@ -131,10 +131,12 @@ class L1Estimator(Estimator):
         print(np.random.standard_cauchy(n))
 
         # Number of experience run
-
         self.A = int(np.ceil(np.log(1/delta)))
         self.B = s
         self.n = n
+
+        # Define T for T-truncated-cauchy
+        self.T = 100 * self.n
 
         # Number of items in the stream
         self.N = 0
@@ -144,24 +146,44 @@ class L1Estimator(Estimator):
         self.t_2 = np.zeros((self.A, self.B), dtype=float)
         self.t_3 = np.zeros(self.A, dtype=float)
 
-        # # Use polynomial of degree 3 to generate 4-independent hash functions
-        # self.p = _choose_prime(10 * n)
-        # self.param_x = self._generate_random_hash_parameters()
-        # self.param_y = self._generate_random_hash_parameters()
+        # Get cauchy
+        (self.x_cauchy, self.y_cauchy) = self._get_cauchy()
 
-    def _get_random_cauchy():
-        pass
+    def _get_cauchy(self):
+        x_cauchy = np.zeros((self.A, self.B, self.n), dtype=float)
+        y_t_cauchy = np.zeros((self.A, self.n), dtype=float)
 
-    def _get_t_trukcated_cauchy():
-        pass
+        for i in range(self.A):
+            x_cauchy[i] = self._get_x_cauchy()
+            y_t_cauchy[i] = self._get_t_trukcated_cauchy()
+
+        return (x_cauchy, y_t_cauchy)
+
+    def _get_x_cauchy(self):
+        x_cauchy = np.zeros((self.B, self.n))
+        for i in range(self.B):
+            x_cauchy[i] = np.random.standard_cauchy(self.n)
+        return x_cauchy
+
+    def _truncate(self, x):
+        return np.where(x <= -self.T, -self.T, 0) \
+            + np.where((x > -self.T) & (x < self.T), x, 0) \
+            + np.where(x >= self.T, self.T, 0)
+
+    def _get_t_trukcated_cauchy(self):
+        y_cauchy = np.random.standard_cauchy(self.n)
+
+        return self._truncate(y_cauchy)
 
     def _read_item(self, i: int, j: int):
         super()._read_item(i, j)
+
         # x_i, y_j = self._calculate_hash_functions(i, j)
-        # self.t_1 += x_i * y_j
-        # self.t_2 += x_i
-        # self.t_3 += y_j
-        pass
+        for s in range(self.B):
+            # self.t_1 += x_i * y_j
+            # self.t_2 += x_i
+            # self.t_3 += y_j
+            pass
 
     def compute(self) -> float:
         # Calculate estimator Upsilon
