@@ -9,10 +9,11 @@ class CounterMatrix(Estimator):
     Args:
         A (int): set the size of counter matrix to be A * A
     """
-    def __init__(self, A: int) -> None:
+    def __init__(self, A: int, metric: str = "l2") -> None:
         super().__init__(input_type=int)
         self.C = np.zeros((A, A), dtype=int)   # Counter matrix
         self.A = A                             # Size of counter matrix
+        self.metric = metric
 
         # Generate hash functions
         self.p = _choose_prime(10 * A)
@@ -53,13 +54,16 @@ class CounterMatrix(Estimator):
         observed = self.C / self.N
         expected = np.dot(p_x, p_y) / self.N ** 2
         
-        return np.linalg.norm(observed - expected) ** 2 / (1-1/self.A) ** 2
+        if self.metric == "l1":
+            return np.sum(np.absolute(observed - expected))
+        else:
+            return np.linalg.norm(observed - expected) ** 2 / (1-1/self.A) ** 2
 
 
 class L2Estimator(Estimator):
     """
-    Estimator for L2 difference that uses multiple counter matrices and return the largest
-    norm (since result from counter matrix is always underestimated).
+    Estimator for L2 difference that uses multiple counter matrices and return the mean
+    norm.
 
     Args:
         A (int): size of counter matrix
@@ -70,7 +74,7 @@ class L2Estimator(Estimator):
 
         self.C_list = []
         for _ in range(B):
-            self.C_list.append(CounterMatrix(A))
+            self.C_list.append(CounterMatrix(A, metric="l2"))
         
     def _read_item(self, i, j):
         for C in self.C_list:
@@ -82,7 +86,30 @@ class L2Estimator(Estimator):
         return np.sqrt(np.mean(res))
 
 
+class L1Estimator(Estimator):
+    """
+    Estimator for L1 difference that uses multiple counter matrices and return the largest
+    norm (since result from counter matrix is always underestimated).
 
+    Args:
+        A (int): size of counter matrix
+        B (int): number of counter matrices
+    """
+    def __init__(self, A: int, B: int) -> None:
+        super().__init__(input_type=int)
+
+        self.C_list = []
+        for _ in range(B):
+            self.C_list.append(CounterMatrix(A, metric="l1"))
+        
+    def _read_item(self, i, j):
+        for C in self.C_list:
+            C._read_item(i, j)
+    
+    def compute(self) -> float:
+        res = [C.compute() for C in self.C_list]
+        
+        return np.max(res)
 
 
 
