@@ -107,8 +107,8 @@ class L2Estimator(Estimator):
 
 class L1Estimator(Estimator):
     """
-    The class for estimating L1 difference of two distributions. We use the s number of distributions 
-    x_1 ... x_s following Cauchy distribution that are independent, and one distribution following 
+    The class for estimating L1 difference of two distributions. We use the s number of distributions
+    x_1 ... x_s following Cauchy distribution that are independent, and one distribution following
     T-truncated-Cauchy for the estimation.
     """
 
@@ -119,16 +119,13 @@ class L1Estimator(Estimator):
         1-δ.
 
         Args:
-            delta (float): params for (O(ln n), δ)-approx. Determines number of experiments in each 
+            delta (float): params for (O(ln n), δ)-approx. Determines number of experiments in each
                            group (also space usage). We take the mean in each group.
-            s (int): number of groups we run. We take the median values of |t_1_r/m - t_2_r*t_3_r/m^2| 
-                     for all r in each group 
-            n (int): Range of X and Y should be [1, n]. 
+            s (int): number of groups we run. We take the median values of |t_1_r/m - t_2_r*t_3_r/m^2|
+                     for all r in each group
+            n (int): Range of X and Y should be [1, n].
         """
         super().__init__(input_type=int)
-        print("Hi")
-        print(np.random.standard_cauchy(n).shape)
-        print(np.random.standard_cauchy(n))
 
         # Number of experience run
         self.A = int(np.ceil(np.log(1/delta)))
@@ -175,24 +172,21 @@ class L1Estimator(Estimator):
 
         return self._truncate(y_cauchy)
 
-    def _read_item(self, i: int, j: int):
+    def _read_item(self, i: int, j: int) -> None:
         super()._read_item(i, j)
-
-        # x_i, y_j = self._calculate_hash_functions(i, j)
-        for s in range(self.B):
-            # self.t_1 += x_i * y_j
-            # self.t_2 += x_i
-            # self.t_3 += y_j
-            pass
+        self.t_1 += self.x_cauchy[:, :, i] * np.dot(self.y_cauchy[:, j].reshape(self.A, 1), np.ones(self.B).reshape(1, self.B))
+        self.t_2 += self.x_cauchy[:, :, i]
+        self.t_3 += self.y_cauchy[:, j]
 
     def compute(self) -> float:
         # Calculate estimator Upsilon
-        # Upsilon = (self.t_1 / self.N - self.t_2 * self.t_3 / self.N ** 2) ** 2
+        t_3 = np.dot(self.t_3.reshape(self.A, 1), np.ones(self.B).reshape(1, self.B))
+        Upsilon = np.abs((self.t_1 / self.N - self.t_2 * t_3 / self.N ** 2) ** 2)
 
-        # # Calculate mean of each group
-        # means = np.mean(Upsilon, axis=0)
+        # Calculate mean of each group
+        means = np.median(Upsilon, axis=0)
 
-        # # Calculate the median of all means
-        # med = np.median(means)
+        # Calculate the median of all means
+        med = np.median(means)
 
-        return 0
+        return med
