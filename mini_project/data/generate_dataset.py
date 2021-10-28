@@ -93,7 +93,7 @@ class DiscreteSampleGenerator(DataGenerator):
 
 
 if __name__ == "__main__":
-    generator = DiscreteSampleGenerator(n=100, N=10000, independent=True)
+    generator = DiscreteSampleGenerator(n=10, N=100000, independent=False)
     generator.write_file("sample")
 
     

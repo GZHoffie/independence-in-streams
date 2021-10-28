@@ -53,7 +53,7 @@ class CounterMatrix(Estimator):
         observed = self.C / self.N
         expected = np.dot(p_x, p_y) / self.N ** 2
         
-        return np.linalg.norm(observed - expected)
+        return np.linalg.norm(observed - expected) ** 2 / (1-1/self.A) ** 2
 
 
 class L2Estimator(Estimator):
@@ -77,10 +77,9 @@ class L2Estimator(Estimator):
             C._read_item(i, j)
     
     def compute(self) -> float:
-        res = 0.0
-        for C in self.C_list:
-            res = max(res, C.compute())
-        return res
+        res = [C.compute() for C in self.C_list]
+        
+        return np.sqrt(np.mean(res))
 
 
 
