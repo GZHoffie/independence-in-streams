@@ -103,3 +103,86 @@ class L2Estimator(Estimator):
         # Calculate the median of all means
         med = np.median(means)
         return np.sqrt(med)
+
+
+class L1Estimator(Estimator):
+    """
+    The class for estimating L1 difference of two distributions. We use the s number of distributions
+    x_1 ... x_s following Cauchy distribution that are independent, and one distribution following
+    T-truncated-Cauchy for the estimation.
+    """
+
+    def __init__(self, delta: float, s: int, n: int = 10000) -> None:
+        """
+        To reduce error, the user should specify A=O(ε^(-2)) and B=O(log(1/δ))
+        so that we can achive an (1+ε)-multiplicative error with probability at least
+        1-δ.
+
+        Args:
+            delta (float): params for (O(ln n), δ)-approx. Determines number of experiments in each
+                           group (also space usage). We take the mean in each group.
+            s (int): number of groups we run. We take the median values of |t_1_r/m - t_2_r*t_3_r/m^2|
+                     for all r in each group
+            n (int): Range of X and Y should be [1, n].
+        """
+        super().__init__(input_type=int)
+
+        # Number of experience run
+        self.A = int(np.ceil(np.log(1/delta)))
+        self.B = s
+        self.n = n + 1
+
+        # Define T for T-truncated-cauchy
+        self.T = 100 * self.n
+
+        # Number of items in the stream
+        self.N = 0
+
+        # Matrices to store intermediate values
+        self.t_1 = np.zeros((self.A, self.B), dtype=float)
+        self.t_2 = np.zeros((self.A, self.B), dtype=float)
+        self.t_3 = np.zeros(self.A, dtype=float)
+
+        # Get cauchy
+        (self.x_cauchy, self.y_cauchy) = self._get_cauchy()
+
+    def _get_cauchy(self):
+        x_cauchy = np.zeros((self.A, self.B, self.n), dtype=float)
+        y_t_cauchy = np.zeros((self.A, self.n), dtype=float)
+
+        for i in range(self.A):
+            x_cauchy[i] = self._get_x_cauchy()
+            y_t_cauchy[i] = self._get_t_trukcated_cauchy()
+
+        return (x_cauchy, y_t_cauchy)
+
+    def _get_x_cauchy(self):
+        x_cauchy = np.zeros((self.B, self.n))
+        for i in range(self.B):
+            x_cauchy[i] = np.random.standard_cauchy(self.n)
+        return x_cauchy
+
+    def _truncate(self, x):
+        return np.where(x <= -self.T, -self.T, 0) \
+            + np.where((x > -self.T) & (x < self.T), x, 0) \
+            + np.where(x >= self.T, self.T, 0)
+
+    def _get_t_trukcated_cauchy(self):
+        y_cauchy = np.random.standard_cauchy(self.n)
+
+        return self._truncate(y_cauchy)
+
+    def _read_item(self, i: int, j: int) -> None:
+        super()._read_item(i, j)
+        self.t_1 += self.x_cauchy[:, :, i] * np.dot(self.y_cauchy[:, j].reshape(self.A, 1), np.ones((1, self.B)))
+        self.t_2 += self.x_cauchy[:, :, i]
+        self.t_3 += self.y_cauchy[:, j]
+
+    def compute(self) -> float:
+        # Calculate estimator Upsilon
+        upsilon = np.zeros((self.A, self.B), dtype=float)
+        for a in range(self.A):
+            for b in range(self.B):
+                upsilon[a, b] = (self.t_1[a, b]/self.N - self.t_2[a, b]*self.t_3[a]/self.N ** 2) ** 2
+
+        return np.median(np.median(upsilon, axis=0))

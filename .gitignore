@@ -1,3 +1,6 @@
 __pycache__
 *.txt
 *.pickle
+workspace.xml
+.vscode
+.idea
