@@ -130,7 +130,7 @@ class L1Estimator(Estimator):
         # Number of experience run
         self.A = int(np.ceil(np.log(1/delta)))
         self.B = s
-        self.n = n
+        self.n = n + 1
 
         # Define T for T-truncated-cauchy
         self.T = 100 * self.n
@@ -180,13 +180,9 @@ class L1Estimator(Estimator):
 
     def compute(self) -> float:
         # Calculate estimator Upsilon
-        t_3 = np.dot(self.t_3.reshape(self.A, 1), np.ones((1, self.B)))
-        Upsilon = np.abs((self.t_1 / self.N - self.t_2 * t_3 / self.N ** 2) ** 2)
+        upsilon = np.zeros((self.A, self.B), dtype=float)
+        for a in range(self.A):
+            for b in range(self.B):
+                upsilon[a, b] = (self.t_1[a, b]/self.N - self.t_2[a, b]*self.t_3[a]/self.N ** 2) ** 2
 
-        # Calculate mean of each group
-        means = np.median(Upsilon, axis=0)
-
-        # Calculate the median of all means
-        med = np.median(means)
-
-        return med
+        return np.median(np.median(upsilon, axis=0))
