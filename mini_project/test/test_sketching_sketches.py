@@ -14,7 +14,7 @@ def test_l2_estimator():
 
 def test_l1_estimator():
     """
-    Test function for l2 estimator.
+    Test function for l1 estimator.
     """
     estimator = L1Estimator(0.05, 100)
     error = check_error(estimator, TEST_FILE, 'l1')
@@ -22,4 +22,5 @@ def test_l1_estimator():
 
 
 if __name__ == "__main__":
+    test_l1_estimator()
     test_l2_estimator()
