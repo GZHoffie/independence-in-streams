@@ -16,6 +16,7 @@ def test_l1_estimator():
     error = check_error(estimator, TEST_FILE, metric="l1")
     print("multiplicative error:", error)
 
+
 if __name__ == "__main__":
+    test_l1_estimator()
     test_l2_estimator()
-    # test_l1_estimator()
