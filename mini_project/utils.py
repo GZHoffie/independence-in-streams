@@ -132,18 +132,18 @@ def check_error(estimator: Estimator, file_name: str, metric: str = "l2"):
     #     f"specified ground truth file {GROUND_TRUTH_DIR}{file_name}.pickle."
     assert metric in answer, f"the metric {metric} is not computed in the"\
         f"specified ground truth file {ANSWER_DIR}{file_name}.pickle."
-    
-    print(answer)
-    
+
+    # print(answer)
+
     estimator.read_from_file(file_name)
     res = estimator.compute()
 
-    print("Estimator result:", res)
-    print("Answer:", answer[metric])
+    # print("Estimator result:", res)
+    # print("Answer:", answer[metric])
 
     if metric != "independent":
         # Return multiplicative error
-        return abs(1 - res/answer[metric])
+        return (res, answer[metric], abs(1 - res/answer[metric]))
     else:
         # Return 0 if correctly identified independence/dependence and 1 otherwise
         return int(res != answer[metric])
