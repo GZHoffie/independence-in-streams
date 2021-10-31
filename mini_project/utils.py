@@ -3,10 +3,9 @@ import warnings
 import pickle
 
 
-TEST_DATA_DIR = "test/test_data/"
-GROUND_TRUTH_DIR = "test/ground_truth/"
-ANSWER_DIR = "test/answer/"
-
+TEST_DATA_DIR = "mini_project/test/test_data/"
+GROUND_TRUTH_DIR = "mini_project/test/ground_truth/"
+ANSWER_DIR = "mini_project/test/answer/"
 
 class Estimator:
     """
