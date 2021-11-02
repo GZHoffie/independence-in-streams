@@ -23,5 +23,5 @@ def test_l1_estimator():
 
 
 if __name__ == "__main__":
-    test_l1_estimator()
+    #test_l1_estimator()
     test_l2_estimator()

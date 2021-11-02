@@ -1,3 +1,4 @@
+from typing import Optional
 from mini_project.utils import Estimator, _choose_prime
 import numpy as np
 
@@ -54,10 +55,7 @@ class CounterMatrix(Estimator):
         observed = self.C / self.N
         expected = np.dot(p_x, p_y) / self.N ** 2
         
-        if self.metric == "l1":
-            return np.sum(np.absolute(observed - expected))
-        else:
-            return np.linalg.norm(observed - expected) ** 2 / (1-1/self.A) ** 2
+        return np.linalg.norm(observed - expected) ** 2 / (1-1/self.A) ** 2
 
 
 class L2Estimator(Estimator):
@@ -82,7 +80,7 @@ class L2Estimator(Estimator):
     
     def compute(self) -> float:
         res = [C.compute() for C in self.C_list]
-        
+        print("variance:", np.var(res))
         return np.sqrt(np.mean(res))
 
 
@@ -94,9 +92,11 @@ class L1Estimator(Estimator):
     Args:
         A (int): size of counter matrix
         B (int): number of counter matrices
+        n (int): range of the distributions
     """
-    def __init__(self, A: int, B: int) -> None:
+    def __init__(self, A: int, B: int, n: int) -> None:
         super().__init__(input_type=int)
+        self.n = n
 
         self.C_list = []
         for _ in range(B):
@@ -109,7 +109,7 @@ class L1Estimator(Estimator):
     def compute(self) -> float:
         res = [C.compute() for C in self.C_list]
         
-        return np.max(res)
+        return np.sqrt(np.mean(res)) * self.n
 
 
 

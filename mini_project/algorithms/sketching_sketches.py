@@ -99,6 +99,7 @@ class L2Estimator(Estimator):
 
         # Calculate mean of each group
         means = np.mean(Upsilon, axis=0)
+        print("variance:", np.var(means))
 
         # Calculate the median of all means
         med = np.median(means)

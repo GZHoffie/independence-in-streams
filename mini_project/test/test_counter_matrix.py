@@ -3,6 +3,7 @@ from mini_project.utils import check_error
 
 TEST_FILE = "sample"
 
+
 def test_l2_estimator():
     """
     Test function for l2 estimator.
