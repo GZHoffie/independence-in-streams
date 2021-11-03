@@ -136,7 +136,6 @@ def check_error(estimator: Estimator, file_name: str, metric: str = "l2"):
     
     estimator.read_from_file(file_name)
     res = estimator.compute()
-
     print("Estimator result:", res)
     print("Answer:", answer[metric])
 

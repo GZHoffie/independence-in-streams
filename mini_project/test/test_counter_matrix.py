@@ -7,7 +7,7 @@ def test_l2_estimator():
     """
     Test function for l2 estimator.
     """
-    estimator = L2Estimator(10, 10)
+    estimator = L2Estimator(2, 100)
     error = check_error(estimator, TEST_FILE)
     print("multiplicative error:", error)
 
