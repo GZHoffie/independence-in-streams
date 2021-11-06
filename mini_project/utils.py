@@ -2,11 +2,10 @@ import os
 import warnings
 import pickle
 
-
-TEST_DATA_DIR = "test/test_data/"
-GROUND_TRUTH_DIR = "test/ground_truth/"
-ANSWER_DIR = "test/answer/"
-
+CURRENT_WORK_DIR = os.path.abspath(os.path.dirname(__file__))
+TEST_DATA_DIR = os.path.join(CURRENT_WORK_DIR, 'test', 'test_data')
+GROUND_TRUTH_DIR = os.path.join(CURRENT_WORK_DIR, 'test', 'ground_truth')
+ANSWER_DIR = os.path.join(CURRENT_WORK_DIR, 'test', 'answer')
 
 class Estimator:
     """
@@ -40,7 +39,7 @@ class Estimator:
         Args:
             file_name (string): the path to the data file.
         """
-        with open(TEST_DATA_DIR + file_name + ".txt", 'r') as f:
+        with open(os.path.join(TEST_DATA_DIR, file_name + '.txt')) as f:
             for line in f:
                 i, j = [self.input_type(x) for x in line.split()]
                 self._read_item(i, j)
@@ -99,16 +98,21 @@ class DataGenerator:
         Args:
             file_name (string): the path to the data file.
         """
+        # Make directory if the paths doesn't exist
+        for directory in [TEST_DATA_DIR, GROUND_TRUTH_DIR, ANSWER_DIR]:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
         # Write data
-        if os.path.exists(TEST_DATA_DIR + file_name + ".txt") and not self.overwrite:
+        if os.path.exists(os.path.join(TEST_DATA_DIR, file_name + '.txt')) and not self.overwrite:
             warnings.warn(f"The path {file_name}.txt already exists in {TEST_DATA_DIR}. Skipping the function.")
             return
-        with open(TEST_DATA_DIR + file_name + ".txt", 'w') as f:
+        with open(os.path.join(TEST_DATA_DIR, file_name + '.txt'), 'w') as f:
             for _ in range(self.N):
                 i, j = self._generate_item()
                 f.write(str(i) + " " + str(j) + "\n")
         
-        with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'wb') as p:
+        with open(os.path.join(GROUND_TRUTH_DIR, file_name + '.pickle'), 'wb') as p:
             pickle.dump(self.ground_truth, p, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -122,24 +126,17 @@ def check_error(estimator: Estimator, file_name: str, metric: str = "l2"):
         file_name (string): A path to the file in which the stream is stored.
         metric (string): one of the metrics indicated above.
     """
-    # with open(GROUND_TRUTH_DIR + file_name + ".pickle", 'rb') as p:
-    #     ground_truth = pickle.load(p)
-    
-    with open(ANSWER_DIR + file_name + ".pickle", 'rb') as p:
+    with open(os.path.join(ANSWER_DIR, file_name + '.pickle'), 'rb') as p:
         answer = pickle.load(p)
     
-    # assert metric in ground_truth, f"the metric {metric} is not computed in the"\
-    #     f"specified ground truth file {GROUND_TRUTH_DIR}{file_name}.pickle."
     assert metric in answer, f"the metric {metric} is not computed in the"\
         f"specified ground truth file {ANSWER_DIR}{file_name}.pickle."
-
-    # print(answer)
 
     estimator.read_from_file(file_name)
     res = estimator.compute()
 
-    # print("Estimator result:", res)
-    # print("Answer:", answer[metric])
+    print("Estimator result:", res)
+    print("Answer:", answer[metric])
 
     if metric != "independent":
         # Return multiplicative error
