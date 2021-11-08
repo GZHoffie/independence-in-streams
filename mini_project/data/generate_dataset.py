@@ -9,7 +9,8 @@ class DiscreteSampleGenerator(DataGenerator):
     A data generator that generates discrete distributed samples of X and Y.
     Both X and Y should take values between 1 and n.
     """
-    def __init__(self, n: int = 1000, N: int = 100000, independent: bool = False, distribution: str = "random") -> None:
+    def __init__(self, n: int = 1000, N: int = 100000, 
+                 independent: bool = False, distribution: str = "random") -> None:
         """
         Create a discrete sample generator.
 
@@ -118,8 +119,10 @@ class DiscreteSampleGenerator(DataGenerator):
             pickle.dump(answer, p, protocol=pickle.HIGHEST_PROTOCOL)
 
 
+
+
 if __name__ == "__main__":
-    generator = DiscreteSampleGenerator(n=1000, N=100000, independent=False, distribution="zipfian")
+    generator = DiscreteSampleGenerator(n=1000, N=100000, independent=True, distribution="zipfian")
     generator.write_file("sample")
 
     

@@ -81,7 +81,7 @@ class L2Estimator(Estimator):
     def compute(self) -> float:
         res = [C.compute() for C in self.C_list]
         print("variance:", np.var(res))
-        return np.sqrt(np.mean(res))
+        return np.sqrt(np.median(res))
 
 
 class L1Estimator(Estimator):
