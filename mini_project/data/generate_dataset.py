@@ -122,9 +122,11 @@ class DiscreteSampleGenerator(DataGenerator):
 
 
 if __name__ == "__main__":
-    generator = DiscreteSampleGenerator(n=1000, N=100000, independent=True, distribution="zipfian")
-    generator.write_file("sample")
-
-    
-
-
+    generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=True, distribution="zipfian")
+    generator.write_file("10000-1000000-independent-zipfian")
+    generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=False, distribution="zipfian")
+    generator.write_file("10000-1000000-dependent-zipfian")
+    generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=True, distribution="random")
+    generator.write_file("10000-1000000-independent-random")
+    generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=False, distribution="random")
+    generator.write_file("10000-1000000-dependent-random")
