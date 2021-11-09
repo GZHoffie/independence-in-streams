@@ -129,4 +129,4 @@ if __name__ == "__main__":
     generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=True, distribution="random")
     generator.write_file("10000-1000000-independent-random")
     generator = DiscreteSampleGenerator(n=10000, N=1000000, independent=False, distribution="random")
-    generator.write_file("10000-1000000-dependent-radom")
+    generator.write_file("10000-1000000-dependent-random")
